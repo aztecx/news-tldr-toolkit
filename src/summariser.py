@@ -58,7 +58,7 @@ class NewsSummariser:
         # We map max_chars to a max_length in tokens.
         max_tokens = max(50, min(200, max_chars))  # keep it in a safe range
 
-        # Call the transformer summarisation pipeline
+        # Call the transformer summarisation pipeline for the TL;DR
         summary_output = self._summariser(
             text,
             max_length=max_tokens,
@@ -69,11 +69,41 @@ class NewsSummariser:
         # The pipeline returns a list of dicts; we take the first one
         tldr = summary_output[0]["summary_text"].strip()
 
-        # Bullet points: still dummy for this step
-        bullet_points = [
-            "This is a placeholder bullet list.",
-            "The TL;DR above already comes from a real summarisation model.",
-            "In the next step, we will also generate real bullet points.",
-        ]
+        # Now generate bullet points using a second call.
+        # We tell the model explicitly what format we want.
+        bullet_prompt = (
+            "Summarise the following text into 3–5 short bullet points. "
+            "Return them as separate lines, each starting with a dash '-'.\n\n"
+            + text
+        )
+
+        bullets_output = self._summariser(
+            bullet_prompt,
+            max_length=max_tokens,
+            min_length=max_tokens // 4,
+            do_sample=False,
+        )
+
+        bullets_text = bullets_output[0]["summary_text"].strip()
+
+        # Parse the model output into a list of bullet strings.
+        bullet_lines = []
+        for line in bullets_text.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            # Remove leading bullet characters like "-", "•", etc.
+            if line[0] in "-•*":
+                line = line[1:].strip()
+            bullet_lines.append(line)
+
+        # Fallback: if model didn't break into lines, split by sentences.
+        if len(bullet_lines) <= 1:
+            parts = bullets_text.replace("•", "").split(". ")
+            bullet_lines = [p.strip().strip(".") for p in parts if p.strip()]
+
+        # Keep at most 5 bullet points
+        bullet_points = bullet_lines[:5]
 
         return SummaryResult(tldr=tldr, bullet_points=bullet_points)
+
