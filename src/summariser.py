@@ -64,6 +64,8 @@ class NewsSummariser:
             max_length=max_tokens,
             min_length=max_tokens // 4,
             do_sample=False,  # deterministic
+            truncation=True,  # safely cut inputs that are too long
+
         )
 
         # The pipeline returns a list of dicts; we take the first one
@@ -82,6 +84,8 @@ class NewsSummariser:
             max_length=max_tokens,
             min_length=max_tokens // 4,
             do_sample=False,
+            truncation=True,  # safely cut inputs that are too long
+
         )
 
         bullets_text = bullets_output[0]["summary_text"].strip()
