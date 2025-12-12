@@ -13,9 +13,15 @@ from summarise_url import fetch_page_text
 # Simple list of RSS/Atom feeds to query.
 # For v0.1 we keep this small and focused.
 RSS_FEEDS: List[str] = [
-    "https://feeds.bbci.co.uk/news/rss.xml",
-    "https://feeds.bbci.co.uk/news/uk/rss.xml",
+    "https://feeds.bbci.co.uk/news/rss.xml",               # top stories (global-ish)
+    "https://feeds.bbci.co.uk/news/world/rss.xml",         # general world
+    "https://feeds.bbci.co.uk/news/uk/rss.xml",            # UK
+    "https://feeds.bbci.co.uk/news/world/europe/rss.xml",  # Europe
+    "https://feeds.bbci.co.uk/news/world/asia/rss.xml",    # Asia
+    "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml",  # US & Canada
+    "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml",    # Middle East
 ]
+
 
 def fetch_feed_items(feed_url: str) -> List[Dict[str, str]]:
     """
