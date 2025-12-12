@@ -3,3 +3,4 @@ torch
 requests
 beautifulsoup4
 lxml
+streamlit
